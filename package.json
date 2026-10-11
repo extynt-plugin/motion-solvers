@@ -1,0 +1,64 @@
+{
+  "name": "motion-solvers",
+  "version": "0.1.0",
+  "description": "Pure-math motion solvers for animators and script authors: circular arc paths with Bezier keyframes, and stagger timing.",
+  "keywords": [
+    "animation",
+    "motion-design",
+    "after-effects",
+    "extendscript",
+    "stagger",
+    "keyframes",
+    "arc"
+  ],
+  "license": "MIT",
+  "author": "extynt (https://extynt.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/extynt-plugin/motion-solvers.git"
+  },
+  "homepage": "https://github.com/extynt-plugin/motion-solvers#readme",
+  "bugs": {
+    "url": "https://github.com/extynt-plugin/motion-solvers/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --coverage",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run clean && npm run build",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.43",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.9",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^4.1.11"
+  }
+}

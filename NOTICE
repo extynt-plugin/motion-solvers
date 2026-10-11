@@ -1,0 +1,21 @@
+NOTICE
+motion-solvers
+Copyright 2026 extynt
+
+Trademarks and third-party software
+
+extynt is an independent project. It is not affiliated with, endorsed by, sponsored by or approved by Adobe Inc. or any other company named here.
+
+Adobe, After Effects and ExtendScript are either registered trademarks or trademarks of Adobe Inc. in the United States and/or other countries. Nothing here is Adobe code or documentation. Adobe effect and property match names (e.g. ADBE ...) are referenced only to interoperate with After Effects scripting.
+
+Node.js is a trademark of the OpenJS Foundation. npm is a package registry and command-line tool operated by GitHub, Inc. GitHub is a trademark of GitHub, Inc.
+
+Microsoft and TypeScript are trademarks of the Microsoft group of companies.
+
+Ubuntu is a trademark of Canonical Ltd. ESLint, Prettier and Vitest are open-source tools, named only to identify them.
+
+Third-party code: the mulberry32 generator used for order: "random" is by Tommy Ettinger and is in the public domain.
+
+All other trademarks are the property of their respective owners. References are for identification and interoperability only.
+
+Provided as is, without warranty. Use with Adobe software is subject to Adobe's own license terms.
