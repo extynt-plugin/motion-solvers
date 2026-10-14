@@ -137,7 +137,7 @@ const s = solveStagger({
 
 ## After Effects ExtendScript
 
-The helpers return ES3 source text. They do not talk to After Effects themselves, so they are safe to use from any Node tool; save the output as a `.jsx` file and run it with File > Scripts > Run Script File, or send it to After Effects from any tool that can run ExtendScript. Review the result in a scratch comp before relying on it in production work: the generated calls follow the AE scripting guide, but the tests run them against a mock, not a live AE.
+The helpers return ES3 source text. They do not talk to After Effects themselves, so they are safe to use from any Node tool; save the output as a `.jsx` file and run it with File > Scripts > Run Script File, or send it to After Effects from any tool that can run ExtendScript. Review the result in a scratch comp before relying on it in production work: the generated calls follow the AE scripting guide, and the tests run them against a mock, not a live AE. One arc case has been checked in real After Effects; see [Verification](#verification).
 
 The `mulberry32` generator behind `order: "random"` is by Tommy Ettinger (public domain).
 
@@ -202,6 +202,12 @@ You can also skip the helpers and loop over `arc.position.keyframes` yourself in
 ### Limits
 
 The output targets **2D layers with Position not separated** (a two-value Position property). On a 3D layer Position is three-valued and the generated two-value `setValueAtTime` calls are not valid; separated dimensions have no single Position property at all. Keyframe interpolation is LINEAR at every key, so with a `speed` other than `constant` the easing is piecewise-constant per segment: more `segments` approximate it more smoothly. Spatial tangents are written as `[x, y, 0]`, because After Effects rejects two-element arrays for `setSpatialTangentsAtKey`. `keyframesToExtendScript` inserts `propertyExpr` verbatim, so never pass it untrusted strings.
+
+### Verification
+
+On 2026-10-14, in After Effects 26.5 on Windows, the keyframes for one case were applied to a 2D layer (Position not separated) and read back, and rendered frames at 1, 2.5 and 5 seconds showed the layer travelling the circle nose first. The case: `center [810, 675]`, `start [290, 675]`, `sweep 360`, `startTime 0`, `duration 6`, `speed "constant"`, `orient: { forwardAngle: 0 }`. It produced 13 Position keys and 13 Rotation keys; the values read back from After Effects matched, and `tests/arc-live-case.test.ts` pins this output key for key. The keys came from the solver this package was extracted from, and `solveArcPath` returns identical output for the same input. The ExtendScript helpers were not what was run in After Effects, and the tangents were checked only through the rendered path, not read back as numbers.
+
+Not verified in real After Effects: `solveStagger`, the sign convention of the spatial tangents in cases other than the one above (other sweeps, counterclockwise, other start angles), 3D Position, separated dimensions, speeds other than `constant`, and macOS.
 
 ## Development
 
