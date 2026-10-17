@@ -1,6 +1,6 @@
 {
   "name": "motion-solvers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Pure-math motion solvers for animators and script authors: circular arc paths with Bezier keyframes, and stagger timing.",
   "keywords": [
     "animation",

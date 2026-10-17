@@ -43,6 +43,8 @@ const CURVES: readonly StaggerCurve[] = ["linear", "ease-in", "ease-out", "ease-
 const MAX_COUNT = 1000;
 const MAX_SPAN = 3600;
 const MAX_START_TIME = 1e6;
+/** mulberry32 reads the seed as an unsigned 32-bit integer, so seeds outside 0..MAX_SEED would alias other seeds. */
+const MAX_SEED = 4294967295;
 
 function checkNonNegative(value: unknown, name: string): string | undefined {
   return firstError([
@@ -69,6 +71,10 @@ function checkOptional(input: StaggerInput): string | undefined {
     () => checkOneOf(input.order, ORDERS, "order"),
     () => checkOneOf(input.curve, CURVES, "curve"),
     () => (seed === undefined || Number.isInteger(seed) ? undefined : "seed must be an integer"),
+    () =>
+      seed === undefined || (seed >= 0 && seed <= MAX_SEED)
+        ? undefined
+        : `seed must be between 0 and ${MAX_SEED}`,
     () => (itemDuration === undefined ? undefined : checkFinite(itemDuration, "itemDuration")),
     () =>
       itemDuration !== undefined && itemDuration <= 0 ? "itemDuration must be positive" : undefined,

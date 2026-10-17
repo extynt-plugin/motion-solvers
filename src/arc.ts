@@ -26,7 +26,7 @@ export interface ArcPathInput {
   duration: number;
   /** Default "constant". */
   speed?: SpeedProfile;
-  /** Path segments (keyframes = segments + 1), integer 1..64. Default max(2, ceil(|sweep| / 30)), capped at 64. */
+  /** Path segments (keyframes = segments + 1), integer 1..64, each turning at most 90 degrees. Default max(2, ceil(|sweep| / 30)), capped at 64. */
   segments?: number;
   /** Also solve Rotation so the layer faces its direction of travel. */
   orient?: {
@@ -50,6 +50,7 @@ export interface ArcPathResult {
 const SPEEDS: readonly SpeedProfile[] = ["constant", "accelerate", "decelerate", "ease-in-out"];
 const DEG = Math.PI / 180;
 const MAX_SEGMENTS = 64;
+const MAX_DEGREES_PER_SEGMENT = 90;
 const MAX_START_TIME = 1e6;
 const MIN_SWEEP = 0.001;
 const POSITION_PATH = "ADBE Transform Group/ADBE Position";
@@ -147,6 +148,14 @@ function checkSegments(segments: number): string | undefined {
   return undefined;
 }
 
+/** Each segment's cubic handle approximates an arc only up to 90 degrees, so |sweep| / segments must not exceed it. */
+function checkSegmentSweep(sweep: number, segments: number): string | undefined {
+  const turn = Math.abs(sweep);
+  if (turn / segments <= MAX_DEGREES_PER_SEGMENT) return undefined;
+  const minimum = Math.ceil(turn / MAX_DEGREES_PER_SEGMENT);
+  return `segments must be at least ${minimum} for a ${turn} degree sweep; each segment may turn at most 90 degrees.`;
+}
+
 function keyTimes(input: ArcPathInput, segments: number): number[] | string {
   const speed = input.speed ?? "constant";
   const times: number[] = [];
@@ -170,6 +179,7 @@ function buildPlan(input: ArcPathInput): Plan | string {
     input.segments ?? Math.min(MAX_SEGMENTS, Math.max(2, Math.ceil(Math.abs(input.sweep) / 30)));
   const error = firstError([
     () => checkSegments(segments),
+    () => checkSegmentSweep(input.sweep, segments),
     () => checkOrient(input.orient),
     () => {
       const forward = input.orient?.forwardAngle;

@@ -1,6 +1,12 @@
 import { expect, test } from "vitest";
 import { stagger } from "./helpers.js";
 
+test("a single item with total has span 0, since every start is identical", () => {
+  const r = stagger({ count: 1, startTime: 2, total: 1 });
+  expect(r.starts).toEqual([2]);
+  expect(r.span).toBe(0);
+});
+
 test("forward order, 5 items", () => {
   const r = stagger({ count: 5, startTime: 1, step: 0.1 });
   expect(r.starts).toEqual([1, 1.1, 1.2, 1.3, 1.4]);
@@ -82,11 +88,10 @@ test("random ranks are a permutation of 0..count-1", () => {
   expect([...r.ranks].sort((x, y) => x - y)).toEqual(Array.from({ length: 50 }, (_, i) => i));
 });
 
-test("random defaults to seed 1, and accepts zero and negative seeds", () => {
+test("random defaults to seed 1, and accepts seed 0", () => {
   const base = { count: 10, startTime: 0, step: 0.1, order: "random" } as const;
   expect(stagger(base)).toEqual(stagger({ ...base, seed: 1 }));
   expect(stagger({ ...base, seed: 0 }).ranks).toHaveLength(10);
-  expect(stagger({ ...base, seed: -5 }).ranks).toHaveLength(10);
 });
 
 test("itemDuration adds ends and the overall end", () => {

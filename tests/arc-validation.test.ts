@@ -76,6 +76,16 @@ const cases: Case[] = [
   ["65 segments", { segments: 65 }, "segments must be an integer 1..64"],
   ["fractional segments", { segments: 2.5 }, "segments must be an integer 1..64"],
   ["negative segments", { segments: -3 }, "segments must be an integer 1..64"],
+  [
+    "360 degrees in one segment",
+    { sweep: 360, segments: 1 },
+    "segments must be at least 4 for a 360 degree sweep; each segment may turn at most 90 degrees.",
+  ],
+  [
+    "91 degrees in one segment",
+    { sweep: 91, segments: 1 },
+    "segments must be at least 2 for a 91 degree sweep; each segment may turn at most 90 degrees.",
+  ],
 ];
 
 test.each(cases)("rejects %s", (_name, overrides, message) => {

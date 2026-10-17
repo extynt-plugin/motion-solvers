@@ -87,6 +87,15 @@ test("default segments follow the sweep", () => {
   expect(arc({ segments: undefined, sweep: 360 }).position.keyframes).toHaveLength(13);
 });
 
+test("a segment may turn at most 90 degrees: the boundary is accepted with the standard handle", () => {
+  const handle = (r: ReturnType<typeof arc>): number => {
+    const tangent = r.position.keyframes[0]?.spatial?.outTangent ?? [Number.NaN, Number.NaN];
+    return Math.hypot(tangent[0], tangent[1]);
+  };
+  expectClose(handle(arc({ sweep: 90, segments: 1 })), 0.5523 * 100, 2);
+  expectClose(handle(arc({ sweep: 360, segments: 4 })), 0.5523 * 100, 2);
+});
+
 test("a full 360 turn returns to the start point", () => {
   const r = arc({ sweep: 360, segments: 12 });
   expect(r.endPoint).toEqual([1060, 540]);
