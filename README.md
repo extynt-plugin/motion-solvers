@@ -78,16 +78,16 @@ if (arc.ok) {
 
 ### `solveArcPath(input): ArcPathResult | SolverFailure`
 
-| Input                   | Meaning                                                                                                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `center: [x, y]`        | Circle center.                                                                                                                                              |
-| `start: [x, y]`         | Starting point. Derives `radius` and `startAngle`. Use instead of the next two.                                                                             |
-| `radius`, `startAngle`  | Circle radius (> 0) and start angle in degrees (0 = right of center, 90 = below).                                                                           |
-| `sweep`                 | Degrees to travel. Positive is clockwise, negative counterclockwise. `0.001 <= abs(sweep) <= 3600`.                                                         |
-| `startTime`, `duration` | Seconds. `0 <= startTime <= 1000000`, `duration > 0`.                                                                                                       |
-| `speed?`                | `"constant"` (default), `"accelerate"`, `"decelerate"`, `"ease-in-out"`. Controls how progress along the arc relates to time.                               |
-| `segments?`             | Integer 1 to 64. Keyframes = segments + 1. Default `min(64, max(2, ceil(abs(sweep) / 30)))`.                                                                |
-| `orient?`               | `{ forwardAngle?: number }`. Adds a rotation track. `forwardAngle` is where the artwork points at rotation 0: 0 right (default), 90 down, -90 up, 180 left. |
+| Input                   | Meaning                                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `center: [x, y]`        | Circle center.                                                                                                                                                              |
+| `start: [x, y]`         | Starting point. Derives `radius` and `startAngle`. Use instead of the next two.                                                                                             |
+| `radius`, `startAngle`  | Circle radius (> 0) and start angle in degrees (0 = right of center, 90 = below).                                                                                           |
+| `sweep`                 | Degrees to travel. Positive is clockwise, negative counterclockwise. `0.001 <= abs(sweep) <= 3600`.                                                                         |
+| `startTime`, `duration` | Seconds. `0 <= startTime <= 1000000`, `duration > 0`.                                                                                                                       |
+| `speed?`                | `"constant"` (default), `"accelerate"`, `"decelerate"`, `"ease-in-out"`. Controls how progress along the arc relates to time.                                               |
+| `segments?`             | Integer 1 to 64, and at least `ceil(abs(sweep) / 90)`: one segment may turn at most 90 degrees. Keyframes = segments + 1. Default `min(64, max(2, ceil(abs(sweep) / 30)))`. |
+| `orient?`               | `{ forwardAngle?: number }`. Adds a rotation track. `forwardAngle` is where the artwork points at rotation 0: 0 right (default), 90 down, -90 up, 180 left.                 |
 
 Returns `position` and (with `orient`) `rotation` as `{ propertyPath, keyframes }`, plus `radius`, `startAngle`, `endAngle`, `endPoint` and `arcLength`. Spatial handles are relative to each keyframe, as in AE. End keyframes have a zero outer handle and are not continuous; interior ones are continuous. Rotation keeps winding past 360 for sweeps beyond one turn.
 
@@ -129,7 +129,7 @@ const s = solveStagger({
 | `startTime`       | Seconds, when the earliest item starts. `0` to `1000000`.                                                                                           |
 | `step` or `total` | Give exactly one. `step` is seconds between consecutive ranks; `total` fits all ranks into a fixed number of seconds. The span may not exceed 3600. |
 | `order?`          | `"forward"` (default), `"reverse"`, `"center-out"`, `"edges-in"`, `"random"`.                                                                       |
-| `seed?`           | Integer for `"random"` (default 1). The same seed always gives the same order.                                                                      |
+| `seed?`           | Integer 0 to 4294967295 for `"random"` (default 1). The same seed always gives the same order.                                                      |
 | `curve?`          | `"linear"` (default), `"ease-in"`, `"ease-out"`, `"ease-in-out"`. Redistributes starts across the span without changing the first or last.          |
 | `itemDuration?`   | Seconds, `> 0`. Adds `ends` and `end`.                                                                                                              |
 

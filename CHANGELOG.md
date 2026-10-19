@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The README input tables now state the segment limit and seed range added in 0.1.2.
+- Source comments are gone apart from a short header per file, so the published type declarations no longer carry doc comments. The README is the API reference. No change to library behavior.
+
 ## 0.1.2
 
 - `solveArcPath` rejects an explicit `segments` count that leaves a segment turning more than 90 degrees, for example `sweep: 360, segments: 1`. A segment's Bezier handle only approximates the arc up to 90 degrees; past that the handle reversed, vanished or grew far too long. The error gives the minimum count, `ceil(|sweep| / 90)`. The default segment count is unaffected.
