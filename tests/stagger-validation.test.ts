@@ -1,3 +1,4 @@
+// Input validation for solveStagger.
 import { expect, test } from "vitest";
 import type { StaggerInput } from "../src/index.js";
 import { solveStagger } from "../src/index.js";

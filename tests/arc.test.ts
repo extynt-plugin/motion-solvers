@@ -1,3 +1,4 @@
+// Geometry, timing and handle tests for solveArcPath.
 import { expect, test } from "vitest";
 import { solveArcPath } from "../src/index.js";
 import { arc, expectClose, pos, times } from "./helpers.js";

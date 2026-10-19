@@ -1,3 +1,5 @@
+// ESLint setup: strict type-checked rules plus the size limits (500-line files, 80-line functions,
+// complexity 10, depth 4, 5 parameters), with inline disable comments turned off.
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 

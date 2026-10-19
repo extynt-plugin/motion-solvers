@@ -1,3 +1,4 @@
+// Public entry point.
 export { solveArcPath } from "./arc.js";
 export type { ArcPathInput, ArcPathResult } from "./arc.js";
 export { solveStagger } from "./stagger.js";

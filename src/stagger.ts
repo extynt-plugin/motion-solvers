@@ -1,3 +1,6 @@
+// solveStagger: start times for a group of items in forward, reverse, center-out, edges-in or
+// seeded random order. The random order uses mulberry32 by Tommy Ettinger (public domain), as
+// published at https://github.com/bryc/code/blob/master/jshash/PRNGs.md.
 import type { SolverFailure } from "./types.js";
 import { failure, round3 } from "./types.js";
 import { checkFinite, checkOneOf, firstError } from "./validate.js";
@@ -6,35 +9,22 @@ export type StaggerOrder = "forward" | "reverse" | "center-out" | "edges-in" | "
 export type StaggerCurve = "linear" | "ease-in" | "ease-out" | "ease-in-out";
 
 export interface StaggerInput {
-  /** Number of items, integer 1..1000. Item k is the k-th item the caller lists. */
   count: number;
-  /** When the first-starting item starts (seconds, >= 0). */
   startTime: number;
-  /** Seconds between consecutive start ranks. Give exactly one of step or total. */
   step?: number;
-  /** Seconds from the first start to the last start. Give exactly one of step or total. */
   total?: number;
-  /** Which items start first. Default "forward". */
   order?: StaggerOrder;
-  /** Integer seed for order "random" (default 1); same seed gives the same result. */
   seed?: number;
-  /** Spreads the start ranks non-uniformly across the span. Default "linear". */
   curve?: StaggerCurve;
-  /** When given (> 0), ends[k] = starts[k] + itemDuration. */
   itemDuration?: number;
 }
 
 export interface StaggerResult {
   ok: true;
-  /** starts[k] is item k's start time, in the caller's item order (not sorted by time). */
   starts: number[];
-  /** Present only when itemDuration was given. */
   ends?: number[];
-  /** ranks[k] is 0 for the items that start first; equal ranks start together. */
   ranks: number[];
-  /** Seconds from the first start to the last start. */
   span: number;
-  /** Time the last item ends (only when itemDuration is given). */
   end?: number;
 }
 
@@ -43,7 +33,6 @@ const CURVES: readonly StaggerCurve[] = ["linear", "ease-in", "ease-out", "ease-
 const MAX_COUNT = 1000;
 const MAX_SPAN = 3600;
 const MAX_START_TIME = 1e6;
-/** mulberry32 reads the seed as an unsigned 32-bit integer, so seeds outside 0..MAX_SEED would alias other seeds. */
 const MAX_SEED = 4294967295;
 
 function checkNonNegative(value: unknown, name: string): string | undefined {
@@ -91,7 +80,6 @@ function validate(input: StaggerInput): string | undefined {
   ]);
 }
 
-/** Rank of each item under "center-out": the center item(s) are 0, ties share a rank. */
 function centerOutRanks(count: number): number[] {
   const center = (count - 1) / 2;
   const distances = Array.from({ length: count }, (_, k) => Math.round(Math.abs(k - center) * 1e9));
@@ -100,7 +88,6 @@ function centerOutRanks(count: number): number[] {
   return distances.map((d) => rankOf.get(d) ?? 0);
 }
 
-/** mulberry32 by Tommy Ettinger (public domain), as published at https://github.com/bryc/code/blob/master/jshash/PRNGs.md */
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -112,7 +99,6 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-/** A seeded permutation: ranks[k] is the position of item k after a Fisher-Yates shuffle. */
 function randomRanks(count: number, seed: number): number[] {
   const rng = mulberry32(seed);
   const items = Array.from({ length: count }, (_, k) => k);
@@ -145,10 +131,6 @@ function applyCurve(f: number, curve: StaggerCurve): number {
   return f;
 }
 
-/**
- * Computes a start time for each of `count` items. `step` gives seconds between consecutive ranks;
- * `total` fits all ranks into a fixed span. Returns `{ ok: false, error }` for invalid input.
- */
 export function solveStagger(input: StaggerInput): StaggerResult | SolverFailure {
   const error = validate(input);
   if (error !== undefined) return failure(error);

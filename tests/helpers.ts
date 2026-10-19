@@ -1,3 +1,4 @@
+// Test fixtures: a base arc input, helpers that unwrap ok and error results, and a closeness check.
 import { expect } from "vitest";
 import { solveArcPath, solveStagger } from "../src/index.js";
 import type { ArcPathInput, ArcPathResult, StaggerInput, StaggerResult } from "../src/index.js";
@@ -35,7 +36,6 @@ export function staggerError(input: StaggerInput): string {
   return result.error;
 }
 
-/** Position keyframe value as a tuple. */
 export function pos(result: ArcPathResult, i: number): [number, number] {
   const value = result.position.keyframes[i]?.value;
   if (!Array.isArray(value)) throw new Error("missing position keyframe");
