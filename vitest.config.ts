@@ -1,3 +1,4 @@
+// Vitest setup with v8 coverage thresholds over src/.
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({

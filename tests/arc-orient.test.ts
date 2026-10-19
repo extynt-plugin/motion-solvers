@@ -1,3 +1,4 @@
+// Rotation keyframes from solveArcPath's orient option.
 import { expect, test } from "vitest";
 import { arc, arcError } from "./helpers.js";
 

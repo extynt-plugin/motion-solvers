@@ -1,9 +1,9 @@
-/** Runtime checks shared by the solvers. Each returns an error message, or undefined when valid. */
+// Input checks shared by the solvers. Each returns an error message, or undefined when the value is
+// valid.
 import type { Vec2 } from "./types.js";
 
 export type Check = () => string | undefined;
 
-/** Runs checks in order and returns the first error. */
 export function firstError(checks: Check[]): string | undefined {
   for (const check of checks) {
     const error = check();
@@ -39,7 +39,6 @@ export function checkOneOf(
     : `${name} must be one of: ${allowed.join(", ")}`;
 }
 
-/** Returns the distance between two valid points. */
 export function distance(a: Vec2, b: Vec2): number {
   return Math.hypot(a[0] - b[0], a[1] - b[1]);
 }

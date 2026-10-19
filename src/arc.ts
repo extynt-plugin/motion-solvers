@@ -1,3 +1,5 @@
+// solveArcPath: a circular arc as Position keyframes with cubic Bezier handles, at most 90 degrees
+// per segment, plus optional Rotation keyframes that keep the layer facing along the path.
 import type { Keyframe, KeyframeTrack, SolverFailure, SpeedProfile, Vec2 } from "./types.js";
 import { failure, round3 } from "./types.js";
 import {
@@ -10,27 +12,16 @@ import {
 } from "./validate.js";
 
 export interface ArcPathInput {
-  /** Center of the circle the motion travels on. */
   center: Vec2;
-  /** Where the motion starts. Radius and startAngle are derived from it; do not also pass them. */
   start?: Vec2;
-  /** Circle radius (> 0). Use together with startAngle instead of start. */
   radius?: number;
-  /** Degrees; 0 = right of center, 90 = below it (y is down). Use together with radius. */
   startAngle?: number;
-  /** Degrees to travel: positive = clockwise on screen, negative = counterclockwise. 0 < |sweep| <= 3600. */
   sweep: number;
-  /** Seconds, >= 0. */
   startTime: number;
-  /** Seconds, > 0. */
   duration: number;
-  /** Default "constant". */
   speed?: SpeedProfile;
-  /** Path segments (keyframes = segments + 1), integer 1..64, each turning at most 90 degrees. Default max(2, ceil(|sweep| / 30)), capped at 64. */
   segments?: number;
-  /** Also solve Rotation so the layer faces its direction of travel. */
   orient?: {
-    /** Where the artwork points at rotation 0: 0 = right (default), 90 = down, -90 = up, 180 = left. */
     forwardAngle?: number;
   };
 }
@@ -38,7 +29,6 @@ export interface ArcPathInput {
 export interface ArcPathResult {
   ok: true;
   position: KeyframeTrack;
-  /** Present only when `orient` was given. */
   rotation?: KeyframeTrack;
   radius: number;
   startAngle: number;
@@ -68,7 +58,6 @@ interface Plan extends Circle {
   times: number[];
 }
 
-/** Fraction of the duration at which progress p along the path is reached (inverse of the speed profile). */
 function timeFraction(p: number, speed: SpeedProfile): number {
   if (speed === "constant") return p;
   if (speed === "accelerate") return Math.sqrt(p);
@@ -148,7 +137,6 @@ function checkSegments(segments: number): string | undefined {
   return undefined;
 }
 
-/** Each segment's cubic handle approximates an arc only up to 90 degrees, so |sweep| / segments must not exceed it. */
 function checkSegmentSweep(sweep: number, segments: number): string | undefined {
   const turn = Math.abs(sweep);
   if (turn / segments <= MAX_DEGREES_PER_SEGMENT) return undefined;
@@ -204,7 +192,6 @@ function round2(v: Vec2): Vec2 {
   return [round3(v[0]), round3(v[1])];
 }
 
-/** Position keyframes with cubic-Bezier handles that approximate a circular arc between keyframes. */
 function positionKeyframes(plan: Plan): Keyframe[] {
   const delta = plan.sweep / plan.segments;
   const sign = plan.sweep > 0 ? 1 : -1;
@@ -230,7 +217,6 @@ function positionKeyframes(plan: Plan): Keyframe[] {
   });
 }
 
-/** Rotation keyframes that keep the layer's forward direction tangent to the path. */
 function rotationKeyframes(plan: Plan, forwardAngle: number): Keyframe[] {
   const delta = plan.sweep / plan.segments;
   const sign = plan.sweep > 0 ? 1 : -1;
@@ -242,10 +228,6 @@ function rotationKeyframes(plan: Plan, forwardAngle: number): Keyframe[] {
   }));
 }
 
-/**
- * Solves a circular arc as position keyframes (cubic-Bezier handles, constant or eased speed),
- * and optionally matching rotation keyframes. Returns `{ ok: false, error }` for invalid input.
- */
 export function solveArcPath(input: ArcPathInput): ArcPathResult | SolverFailure {
   const plan = buildPlan(input);
   if (typeof plan === "string") return failure(plan);

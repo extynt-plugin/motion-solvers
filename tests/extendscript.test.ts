@@ -1,3 +1,4 @@
+// Runs the generated ExtendScript against a fake After Effects object model.
 import { runInNewContext } from "node:vm";
 import { expect, test } from "vitest";
 import {
@@ -35,7 +36,6 @@ class MockProperty {
   }
 }
 
-/** Evaluates generated ExtendScript with a fake AE environment. */
 function run(code: string, env: Record<string, unknown>): void {
   runInNewContext(code, { ...env });
 }

@@ -1,3 +1,4 @@
+// Input validation for solveArcPath.
 import { expect, test } from "vitest";
 import type { ArcPathInput } from "../src/index.js";
 import { solveArcPath } from "../src/index.js";

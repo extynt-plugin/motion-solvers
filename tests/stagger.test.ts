@@ -1,3 +1,4 @@
+// Orders, curves and spans for solveStagger.
 import { expect, test } from "vitest";
 import { stagger } from "./helpers.js";
 

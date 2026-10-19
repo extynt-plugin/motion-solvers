@@ -1,10 +1,8 @@
+// Pins the one arc case checked in After Effects 26.5 on Windows: a full orbit with orient, applied
+// to a 2D layer and read back. Rows are time, x, y, inTangent, outTangent, continuous, rotation.
 import { expect, test } from "vitest";
 import { solveArcPath } from "../src/index.js";
 
-// Input and output of a full-circle orbit with orient, as returned by the product solver this package
-// was extracted from. The keys were applied to a layer in After Effects 26.5 on Windows (2D layer,
-// Position not separated) and read back: positions and rotation matched, and rendered frames showed the
-// layer travelling the circle nose first. Tangents were not read back; see README "Verification".
 const input = {
   center: [810, 675],
   start: [290, 675],
@@ -15,7 +13,6 @@ const input = {
   orient: { forwardAngle: 0 },
 } as const;
 
-// time, x, y, inTangent, outTangent, continuous, rotation
 const expected: ReadonlyArray<
   readonly [number, number, number, [number, number], [number, number], boolean, number]
 > = [

@@ -1,7 +1,5 @@
-/**
- * Turns solver output into ExtendScript (ES3) source that can be saved as a .jsx file and run
- * with File > Scripts > Run Script File, or sent to After Effects by any tool that can run ExtendScript. The generated code is wrapped in an IIFE so it leaves no globals.
- */
+// Turns solver results into ES3 ExtendScript wrapped in an IIFE. Spatial tangents are written as
+// three values because setSpatialTangentsAtKey rejects two, even on a 2D property.
 import type { ArcPathResult } from "./arc.js";
 import type { StaggerResult } from "./stagger.js";
 import type { Keyframe, Vec2 } from "./types.js";
@@ -13,7 +11,6 @@ function literal(value: number | number[]): string {
   return Array.isArray(value) ? `[${value.join(", ")}]` : String(value);
 }
 
-/** AE's setSpatialTangentsAtKey requires 3-element arrays, even on a 2D property. */
 function tangentLiteral(tangent: Vec2): string {
   return literal([tangent[0], tangent[1], 0]);
 }
@@ -43,17 +40,11 @@ function keyframeLines(frame: Keyframe): string[] {
   return lines;
 }
 
-/** `layer.property("A").property("B")` for a match-name path "A/B". */
 export function propertyExpression(layerExpression: string, propertyPath: string): string {
   const chain = propertyPath.split("/").map((name) => `.property(${JSON.stringify(name)})`);
   return `${layerExpression}${chain.join("")}`;
 }
 
-/**
- * ExtendScript that writes `keyframes` onto the property returned by `propertyExpr`, an
- * ExtendScript expression such as `app.project.activeItem.layer(1).property("ADBE Transform Group").property("ADBE Position")`.
- * Existing keyframes at the same times are replaced; others are left alone.
- */
 export function keyframesToExtendScript(keyframes: Keyframe[], propertyExpr: string): string {
   const body = keyframes.flatMap(keyframeLines).map((line) => `  ${line}`);
   return [
@@ -65,10 +56,6 @@ export function keyframesToExtendScript(keyframes: Keyframe[], propertyExpr: str
   ].join("\n");
 }
 
-/**
- * ExtendScript that applies an arc path to `layerExpression` (an expression evaluating to a
- * Layer): position keyframes, plus rotation keyframes when the result has them.
- */
 export function arcPathToExtendScript(result: ArcPathResult, layerExpression: string): string {
   const tracks =
     result.rotation === undefined ? [result.position] : [result.position, result.rotation];
@@ -82,12 +69,6 @@ export function arcPathToExtendScript(result: ArcPathResult, layerExpression: st
     .join("\n");
 }
 
-/**
- * ExtendScript that shifts each layer so its in-point lands on `result.starts[i]`.
- * `layersExpression` must evaluate to a zero-based array of layers in the same order the
- * stagger was solved for, such as `app.project.activeItem.selectedLayers`. The script throws if
- * the layer count differs from the solved count.
- */
 export function staggerToExtendScript(result: StaggerResult, layersExpression: string): string {
   return [
     "(function () {",
